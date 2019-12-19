@@ -1,0 +1,136 @@
+# ===============
+# Settings
+# ===============
+settings:
+  features:
+    - position
+    - age
+    - area_三重県
+    - area_京都府
+    - area_佐賀県
+    - area_兵庫県
+    - area_北海道
+    - area_千葉県
+    - area_和歌山県
+    - area_埼玉県
+    - area_大分県
+    - area_大阪府
+    - area_奈良県
+    - area_宮城県
+    - area_宮崎県
+    - area_富山県
+    - area_山口県
+    - area_山形県
+    - area_山梨県
+    - area_岐阜県
+    - area_岡山県
+    - area_岩手県
+    - area_島根県
+    - area_広島県
+    - area_徳島県
+    - area_愛媛県
+    - area_愛知県
+    - area_新潟県
+    - area_東京都
+    - area_栃木県
+    - area_沖縄県
+    - area_滋賀県
+    - area_熊本県
+    - area_石川県
+    - area_神奈川県
+    - area_福井県
+    - area_福岡県
+    - area_福島県
+    - area_秋田県
+    - area_群馬県
+    - area_茨城県
+    - area_長崎県
+    - area_長野県
+    - area_青森県
+    - area_静岡県
+    - area_香川県
+    - area_高知県
+    - area_鳥取県
+    - area_鹿児島県
+    - sex
+    - partner
+    - num_child
+    - education
+    - service_length
+    - study_time
+    - commute
+    - overtime
+  categorical_features:
+    - area_三重県
+    - area_京都府
+    - area_佐賀県
+    - area_兵庫県
+    - area_北海道
+    - area_千葉県
+    - area_和歌山県
+    - area_埼玉県
+    - area_大分県
+    - area_大阪府
+    - area_奈良県
+    - area_宮城県
+    - area_宮崎県
+    - area_富山県
+    - area_山口県
+    - area_山形県
+    - area_山梨県
+    - area_岐阜県
+    - area_岡山県
+    - area_岩手県
+    - area_島根県
+    - area_広島県
+    - area_徳島県
+    - area_愛媛県
+    - area_愛知県
+    - area_新潟県
+    - area_東京都
+    - area_栃木県
+    - area_沖縄県
+    - area_滋賀県
+    - area_熊本県
+    - area_石川県
+    - area_神奈川県
+    - area_福井県
+    - area_福岡県
+    - area_福島県
+    - area_秋田県
+    - area_群馬県
+    - area_茨城県
+    - area_長崎県
+    - area_長野県
+    - area_青森県
+    - area_静岡県
+    - area_香川県
+    - area_高知県
+    - area_鳥取県
+    - area_鹿児島県
+    - sex
+  
+  fold_name: 01_kfold
+  drop_fname:  
+  convert_type: 'raw'
+  oof:
+    save_oof: True
+    concat_oof: False
+  std: True
+  reduce: False
+  metrics: mae
+
+# ===============
+# Path
+# ===============
+path:
+  train: ../data/input/train_data.feather
+  train_y: ../pickle/salary_raw.pkl
+  sample: ../data/input/sample_submission.feather
+
+# ===============
+# Model Parameters
+# ===============
+model_params:
+  n_neighbors: 5
+  n_jobs: -1

@@ -1,1 +1,2 @@
-# ProbSpace_salary
+# 給与推定コンペ
+https://prob.space/competitions/salary-prediction

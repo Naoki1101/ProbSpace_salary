@@ -1,0 +1,91 @@
+# ===============
+# Settings
+# ===============
+settings:
+  features:
+    - position
+    - age
+    - area
+    - area_count_encoding
+    - sex
+    - partner
+    - num_child
+    - num_family
+    - education
+    - service_length
+    - study_time
+    - commute
+    - overtime
+    - position_area
+    - age_div_mean_each_position
+    - partner_div_mean_each_position
+    - num_child_div_mean_each_position
+    - education_div_mean_each_position
+    - service_length_div_mean_each_position
+    - study_time_div_mean_each_position
+    - commute_div_mean_each_position
+    - overtime_div_mean_each_position
+    - age_div_mean_each_area
+    - partner_div_mean_each_area
+    - num_child_div_mean_each_area
+    - education_div_mean_each_area
+    - service_length_div_mean_each_area
+    - study_time_div_mean_each_area
+    - commute_div_mean_each_area
+    - overtime_div_mean_each_area
+    - age_div_mean_each_sex
+    - partner_div_mean_each_sex
+    - num_child_div_mean_each_sex
+    - education_div_mean_each_sex
+    - service_length_div_mean_each_sex
+    - study_time_div_mean_each_sex
+    - commute_div_mean_each_sex
+    - overtime_div_mean_each_sex
+    - age_div_mean_each_education
+    - partner_div_mean_each_education
+    - num_child_div_mean_each_education
+    - education_div_mean_each_education
+    - service_length_div_mean_each_education
+    - study_time_div_mean_each_education
+    - commute_div_mean_each_education
+    - overtime_div_mean_each_education
+    - position_target_encoding_folds2
+    - area_target_encoding_folds2
+    - sex_target_encoding_folds2
+    - education_target_encoding_folds2
+    - position_education_target_encoding_folds2
+  categorical_features:
+    - area
+    - sex
+    - position_area
+  
+  fold_name: 02_stkfold
+  drop_fname: 
+  convert_type: 'raw'
+  oof:
+    save_oof: True
+    concat_oof: False
+  std: False
+  reduce: False
+  metrics: mae
+
+# ===============
+# Path
+# ===============
+path:
+  train: ../data/input/train_data.feather
+  train_y: ../pickle/salary_raw.pkl
+  sample: ../data/input/sample_submission.feather
+
+# ===============
+# Model Parameters
+# ===============
+model_params:
+  loss_function: RMSE
+  eval_metric: RMSE
+  learning_rate: 0.05
+  iterations: 10000
+  random_seed: 2019
+  od_type: Iter
+  depth: 8
+  early_stopping_rounds: 200

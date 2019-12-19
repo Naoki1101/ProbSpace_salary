@@ -1,0 +1,50 @@
+# ===============
+# Settings
+# ===============
+settings:
+  features:
+    - position
+    - age
+    - area
+    - sex
+    - partner
+    - num_child
+    - education
+    - service_length
+    - study_time
+    - commute
+    - overtime
+  categorical_features:
+    - area
+    - sex
+  
+  fold_name: 01_kfold
+  drop_fname: 
+  convert_type: 'raw'
+  oof:
+    save_oof: True
+    concat_oof: False
+  std: False
+  reduce: False
+  metrics: mae
+
+# ===============
+# Path
+# ===============
+path:
+  train: ../data/input/train_data.feather
+  train_y: ../pickle/salary_raw.pkl
+  sample: ../data/input/sample_submission.feather
+
+# ===============
+# Model Parameters
+# ===============
+model_params:
+  loss_function: RMSE
+  eval_metric: RMSE
+  learning_rate: 0.05
+  iterations: 10000
+  random_seed: 2019
+  od_type: Iter
+  depth: 8
+  early_stopping_rounds: 200

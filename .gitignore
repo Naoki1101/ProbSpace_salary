@@ -1,0 +1,15 @@
+__pycache__/
+.DS_Store
+
+notebooks/*
+!EDA_*.ipynb
+
+logs/
+folds/
+features/
+data/
+pickle/
+src/catboost_info
+
+notify.yml
+tox.ini
