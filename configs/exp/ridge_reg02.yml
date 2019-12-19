@@ -112,10 +112,10 @@ settings:
   
   fold_name:  02_stkfold
   drop_fname:  
-  convert_type: 'raw'
+  convert_type: raw
   oof:
-    save_oof: True
-    concat_oof: False
+    save: True
+    add: 
   std: True
   reduce: False
   metrics: mae

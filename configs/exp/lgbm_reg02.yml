@@ -17,6 +17,7 @@ settings:
     - commute
     - overtime
     - position_area
+    - position_education
     - age_div_mean_each_position
     - partner_div_mean_each_position
     - num_child_div_mean_each_position
@@ -53,15 +54,16 @@ settings:
     - area_target_encoding_folds2
     - sex_target_encoding_folds2
     - education_target_encoding_folds2
-    - position_education_target_encoding_folds2
+    # - position_education_target_encoding_folds2
+    - age_diff_service_length
   categorical_features:
   
   fold_name:  02_stkfold
   drop_fname:  
-  convert_type: 'raw'
+  convert_type: raw
   oof:
-    save_oof: True
-    concat_oof: False
+    save: True
+    add: 
   std: False
   reduce: False
   metrics: mae

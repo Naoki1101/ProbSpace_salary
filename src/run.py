@@ -45,6 +45,8 @@ PATH_PARAMS = config['path']
 MODEL_PARAMS = config['model_params']
 NOTIFY_PARAMS = yml.load(options.notify)
 
+FEATURES = SETTINGS_PARAMS['features']
+
 LOGGER_PATH = Path(f'../logs/{RUN_NAME}')
 
 
@@ -61,8 +63,8 @@ yml.save(LOGGER_PATH / 'config.yml', config)
 
 with t.timer('load data and folds'):
     loader = DataLoader()
-    train_x = loader.load_x(SETTINGS_PARAMS['features'], data_type='train', reduce=SETTINGS_PARAMS['reduce'])
-    test_x = loader.load_x(SETTINGS_PARAMS['features'], data_type='test', reduce=SETTINGS_PARAMS['reduce'])
+    train_x = loader.load_x(FEATURES, data_type='train', reduce=SETTINGS_PARAMS['reduce'])
+    test_x = loader.load_x(FEATURES, data_type='test', reduce=SETTINGS_PARAMS['reduce'])
     train_y = loader.load_y(PATH_PARAMS['train_y'])
     folds = loader.load_folds(SETTINGS_PARAMS['fold_name'])
 
@@ -72,6 +74,14 @@ with t.timer('preprocessing'):
         train_x = train_x.drop(drop_idx, axis=0).reset_index(drop=True)
         train_y = train_y.drop(drop_idx, axis=0).reset_index(drop=True)
         folds = folds.drop(drop_idx, axis=0).reset_index(drop=True)
+
+    if SETTINGS_PARAMS['oof']['add'] is not None:
+        OOF_RUN_NAME = SETTINGS_PARAMS['oof']['add']
+        oof = np.load(f'../logs/{OOF_RUN_NAME}/oof.npy')
+        pred = pd.read_csv(f'../data/output/{OOF_RUN_NAME}.csv')[COMPE_PARAMS['target_name']].values
+        train_x['oof'] = oof
+        test_x['oof'] = pred
+        FEATURES += ['oof']
 
     if SETTINGS_PARAMS['std']:
         whole = pd.concat([train_x, test_x], axis=0)
@@ -93,12 +103,12 @@ with t.timer('train and predict'):
 
     logging.disable(logging.FATAL)
 
-    if SETTINGS_PARAMS['oof']['save_oof']:
+    if SETTINGS_PARAMS['oof']['save']:
         np.save(f'../logs/{RUN_NAME}/oof.npy', oof)
         save_oof_plot(RUN_NAME, train_y, oof, type_='reg', dia=True)
 
 with t.timer('save features importances'):
-    save_importances(RUN_NAME, models, SETTINGS_PARAMS['features'])
+    save_importances(RUN_NAME, models, FEATURES)
 
 with t.timer('make submission'):
     output_path = f'../data/output/{RUN_NAME}_{np.mean(scores):.3f}.csv'

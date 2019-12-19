@@ -102,7 +102,51 @@ class position_education_target_encoding_folds3(Feature):
         self.test[self.__class__.__name__] = te_feat
 
 
+# positionのターゲットエンコーディング(folds4)
+class position_target_encoding_folds4(Feature):
+    def create_features(self):
+        folds = pd.read_feather('../folds/04_stkfold.feather')
+        tr_feat, te_feat = target_encoding(train, test, 'salary', 'position', folds)
+        self.train[self.__class__.__name__] = tr_feat
+        self.test[self.__class__.__name__] = te_feat
 
+
+# areaのターゲットエンコーディング(folds4)
+class area_target_encoding_folds4(Feature):
+    def create_features(self):
+        folds = pd.read_feather('../folds/04_stkfold.feather')
+        tr_feat, te_feat = target_encoding(train, test, 'salary', 'area', folds)
+        self.train[self.__class__.__name__] = tr_feat
+        self.test[self.__class__.__name__] = te_feat
+
+
+# sexのターゲットエンコーディング(folds4)
+class sex_target_encoding_folds4(Feature):
+    def create_features(self):
+        folds = pd.read_feather('../folds/04_stkfold.feather')
+        tr_feat, te_feat = target_encoding(train, test, 'salary', 'sex', folds)
+        self.train[self.__class__.__name__] = tr_feat
+        self.test[self.__class__.__name__] = te_feat
+
+
+# educationのターゲットエンコーディング(folds4)
+class education_target_encoding_folds4(Feature):
+    def create_features(self):
+        folds = pd.read_feather('../folds/04_stkfold.feather')
+        tr_feat, te_feat = target_encoding(train, test, 'salary', 'education', folds)
+        self.train[self.__class__.__name__] = tr_feat
+        self.test[self.__class__.__name__] = te_feat
+
+
+# position + educationのターゲットエンコーディング(folds4)
+class position_education_target_encoding_folds4(Feature):
+    def create_features(self):
+        folds = pd.read_feather('../folds/04_stkfold.feather')
+        train['position_education'] = train['position'].astype(str) + '_' + train['education'].astype(str)
+        test['position_education'] = test['position'].astype(str) + '_' + test['education'].astype(str)
+        tr_feat, te_feat = target_encoding(train, test, 'salary', 'position_education', folds)
+        self.train[self.__class__.__name__] = tr_feat
+        self.test[self.__class__.__name__] = te_feat
 
 
 if __name__ == '__main__':

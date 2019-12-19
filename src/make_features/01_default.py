@@ -123,6 +123,16 @@ class position_area(Feature):
         self.test[self.__class__.__name__] = whole['position_area_str'].map(le).values[len_train:]
 
 
+# positionとeducationを結合&ラベルエンコーディング
+class position_education(Feature):
+    def create_features(self):
+        whole = pd.concat([train, test], axis=0)
+        whole['position_education_str'] = whole['position'].astype(str) + '_' + whole['education'].astype(str)
+        le = {k: i for i, k in enumerate(whole['position_education_str'].unique())}
+        self.train[self.__class__.__name__] = whole['position_education_str'].map(le).values[:len_train]
+        self.test[self.__class__.__name__] = whole['position_education_str'].map(le).values[len_train:]
+
+
 # age / positionの平均年齢
 class age_div_mean_each_position(Feature):
     def create_features(self):
@@ -409,6 +419,13 @@ class overtime_div_mean_each_education(Feature):
         whole[self.__class__.__name__] = whole['age'] / whole.groupby('education')['overtime'].transform('mean')
         self.train[self.__class__.__name__] = whole[self.__class__.__name__].values[:len_train]
         self.test[self.__class__.__name__] = whole[self.__class__.__name__].values[len_train:]
+
+
+# age - servece_length　新卒かどうかを判定できる？
+class age_diff_service_length(Feature):
+    def create_features(self):
+        self.train[self.__class__.__name__] = train['age'] - train['service_length']
+        self.test[self.__class__.__name__] = test['age'] - test['service_length']
 
 
 
