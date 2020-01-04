@@ -12,7 +12,7 @@ from pathlib import Path
 from utils import Timer, seed_everything
 from utils import DataLoader, Yml, make_submission
 from utils import send_line, send_notion
-from runner import train_and_predict, save_importances, save_oof_plot
+from runner import train_and_predict, save_importances, save_oof_plot, save_learning_curve
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -102,6 +102,9 @@ with t.timer('train and predict'):
                                                    metrics=SETTINGS_PARAMS['metrics'])
 
     logging.disable(logging.FATAL)
+
+    if 'nn' in MODEL_NAME:
+        save_learning_curve(RUN_NAME, models)
 
     if SETTINGS_PARAMS['oof']['save']:
         np.save(f'../logs/{RUN_NAME}/oof.npy', oof)

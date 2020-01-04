@@ -18,6 +18,7 @@ settings:
     - overtime
     - position_area
     - position_education
+    - area_partner
     - age_div_mean_each_position
     - partner_div_mean_each_position
     - num_child_div_mean_each_position
@@ -50,12 +51,13 @@ settings:
     - study_time_div_mean_each_education
     - commute_div_mean_each_education
     - overtime_div_mean_each_education
-    - position_target_encoding_folds2
-    - area_target_encoding_folds2
-    - sex_target_encoding_folds2
-    - education_target_encoding_folds2
-    # - position_education_target_encoding_folds2
+    # - position_target_encoding_folds2
+    # - area_target_encoding_folds2
+    # - sex_target_encoding_folds2
+    # - education_target_encoding_folds2
+    - position_education_target_encoding_folds2
     - age_diff_service_length
+    - partner_capital_group
   categorical_features:
   
   fold_name:  02_stkfold
@@ -85,7 +87,7 @@ model_params:
     metric: l1
     learning_rate: 0.01
     num_leaves: 31
-    max_depth: 7
+    max_depth: 9
     colsample_bytree: 0.8
     bagging_fraction: 0.8
     bagging_freq: 1

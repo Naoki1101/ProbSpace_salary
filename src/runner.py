@@ -2,11 +2,15 @@ import numpy as np
 import pandas as pd
 import logging
 
+from sklearn.metrics import confusion_matrix
+
 from models import RIDGRegression
 from models import KNNClassifier, KNNRegressor
+from models import SVMClassifier, SVMRegressor
 from models import XGBClassifier, XGBRegressor
 from models import LGBRegressor, LGBClassifier
 from models import CBRegressor, CBClassifier
+from models import NNRegressor#, NNClassifier
 from metrics import Scorer
 
 import matplotlib
@@ -25,6 +29,10 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
         model = KNNClassifier(params)
     elif 'knn_reg' in model_name:
         model = KNNRegressor(params)
+    elif 'svm_clf' in model_name:
+        model = SVMClassifier(params)
+    elif 'svm_reg' in model_name:
+        model = SVMRegressor(params)
     elif 'xgb_clf' in model_name:
         model = XGBClassifier(params)
     elif 'xgb_reg' in model_name:
@@ -37,6 +45,10 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
         model = CBRegressor(params)
     elif 'cb_clf' in model_name:
         model = CBClassifier(params)
+    elif 'nn_reg' in model_name:
+        model = NNRegressor(params)
+    # elif 'nn_clf' in model_name:
+    #     model = NNClassifier(params)
     else:
         raise(NotImplementedError)
 
@@ -155,3 +167,19 @@ def save_oof_plot(run_name, y_true, y_pred, type_='reg', dia=False):
 
     plt.tight_layout()
     plt.savefig(f'../logs/{run_name}/oof_plot.png')
+
+
+def save_learning_curve(run_name, models):
+    num_model = len(models)
+    r = int((num_model + 2) / 3)
+    plt.figure(figsize=(16, 5 * r))
+
+    for i, model in enumerate(models):
+        all_train_loss, all_val_loss = model.get_train_log()
+        plt.subplot(r, 3, i + 1)
+        plt.plot(all_train_loss, c='blue', label='train')
+        plt.plot(all_val_loss, c='orange', label='val')
+        plt.legend()
+        plt.title('learning curve')
+    plt.tight_layout()
+    plt.savefig(f'../logs/{run_name}/learning_curve.png')

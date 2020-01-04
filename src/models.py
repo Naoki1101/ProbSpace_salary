@@ -1,12 +1,22 @@
 from abc import ABCMeta, abstractmethod
 
+import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+from sklearn.svm import SVC, SVR
 import xgboost as xgb
 import lightgbm as lgb
 from catboost import Pool, CatBoostRegressor, CatBoostClassifier
-
 from lightgbm.callback import _format_eval_result
+
+import torch
+import torchvision
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import torchvision.transforms as transforms
+from torch.autograd import Variable
+
 import logging
 
 
@@ -17,7 +27,7 @@ class Model(metaclass=ABCMeta):
         self.model = None
 
     @abstractmethod
-    def fit(self, tr_x, tr_y, te_x, va_x=None, va_y=None, cat_features=None):
+    def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None):
         pass
 
     @abstractmethod
@@ -59,6 +69,31 @@ class KNNRegressor(Model):
 
         knn = KNeighborsRegressor(**self.params)
         self.model = knn.fit(tr_x, tr_y)
+
+    def predict(self, te_x, cat_features=None):
+        return self.model.predict(te_x)
+
+
+# ===============
+# SVM
+# ===============
+class SVMClassifier(Model):
+
+    def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None, feval=None):
+        
+        svm = SVC(**self.params)
+        self.model = svm.fit(tr_x, tr_y)
+
+    def predict(self, te_x, cat_features=None):
+        return self.model.predict(te_x)
+
+
+class SVMRegressor(Model):
+
+    def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None, feval=None):
+        
+        svm = SVR(**self.params)
+        self.model = svm.fit(tr_x, tr_y)
 
     def predict(self, te_x, cat_features=None):
         return self.model.predict(te_x)
@@ -310,3 +345,116 @@ class CBRegressor(Model):
 
     def extract_importances(self):
         return self.model.feature_importances_
+
+
+# ===============
+# NN
+# ===============
+class CustomLinear(nn.Module):
+    def __init__(self, input_features):
+        super(CustomLinear, self).__init__()
+        self.fc1 = nn.Linear(input_features, 200)
+        self.fc2 = nn.Linear(200, 100)
+        self.fc3 = nn.Linear(100, 50)
+        self.fc4 = nn.Linear(50, 25)
+        self.fc5 = nn.Linear(25, 1)
+        self.dropout = nn.Dropout2d(0.3)
+        
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = self.dropout(x)
+        x = F.relu(self.fc2(x))
+        x = self.dropout(x)
+        x = F.relu(self.fc3(x))
+        x = self.dropout(x)
+        x = F.relu(self.fc4(x))
+        x = self.dropout(x)
+        x = F.relu(self.fc5(x))
+        x = self.dropout(x)
+        return x
+
+
+class NNRegressor(Model):
+    def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None, feval=None):
+
+        epochs = self.params['epochs']
+        batch_size = self.params['batch_size']
+        lr = self.params['lr']
+        device = self.params['device']
+        early_stopping = self.params['early_stopping']
+
+        validation = va_x is not None
+        tr_x = torch.tensor(tr_x.values, dtype=torch.float32)
+        tr_y = torch.tensor(tr_y.values, dtype=torch.float32)
+        train = torch.utils.data.TensorDataset(tr_x, tr_y)
+        train_loader = torch.utils.data.DataLoader(train, batch_size=batch_size, shuffle=True)
+
+        if validation:
+            va_x = torch.tensor(va_x.values, dtype=torch.float32)
+            va_y = torch.tensor(va_y.values, dtype=torch.float32)
+            valid = torch.utils.data.TensorDataset(va_x, va_y)
+            valid_loader = torch.utils.data.DataLoader(valid, batch_size=batch_size, shuffle=False)
+
+        model = CustomLinear(tr_x.shape[1]).to(device)
+        criterion = nn.MSELoss()
+        optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+
+        best_loss = 1e+10
+        counter = 0
+
+        self.all_train_loss = []
+        self.all_val_loss = []
+
+        for epoch in range(epochs):
+
+            if counter == early_stopping:
+                break
+            else:
+                model.train()
+                avg_loss = 0.
+                for x_batch, y_batch in train_loader:
+                    y_pred = model(x_batch.float())
+                    loss = criterion(y_pred.float(), y_batch.float())
+                    optimizer.zero_grad()
+                    loss.backward()
+                    optimizer.step()
+                    avg_loss += loss.item()
+                    
+                    model.eval()
+                    valid_preds_fold = np.zeros((va_x.size(0)))
+                    avg_val_loss = 0.
+                    
+                    for i, (x_batch, y_batch) in enumerate(valid_loader):
+                        y_pred = model(x_batch.float()).detach()
+                        avg_val_loss += criterion(y_pred.float(), y_batch.float()).item()
+                        valid_preds_fold[i * batch_size: (i+1) * batch_size] = y_pred.float().numpy()[:, 0]
+
+                self.all_train_loss.append(avg_loss)
+                self.all_val_loss.append(avg_val_loss)
+
+                if best_loss >= avg_val_loss:
+                    best_loss = avg_val_loss
+                    counter = 0
+                    self.model = model
+                else:
+                    counter += 1
+
+                print(f"[{epoch + 1:02}]  training's rmse: {np.sqrt(avg_loss / len(train_loader)):.4f}     valid_1's rmse: {np.sqrt(avg_val_loss / len(valid_loader)):.4f}")
+
+    def predict(self, te_x, cat_features=None):
+
+        batch_size = self.params['batch_size']
+        
+        test_preds_fold = np.zeros(len(te_x))
+        x_test_tensor = torch.tensor(te_x.values, dtype=torch.float32)
+        test = torch.utils.data.TensorDataset(x_test_tensor)
+        test_loader = torch.utils.data.DataLoader(test, batch_size=batch_size, shuffle=False)
+
+        for i, (x_batch,) in enumerate(test_loader):
+            y_pred = self.model(x_batch.float()).detach()
+            test_preds_fold[i * batch_size: (i+1) * batch_size] = y_pred.numpy()[:, 0]
+        return test_preds_fold
+
+    def get_train_log(self):
+        return self.all_train_loss, self.all_val_loss
+

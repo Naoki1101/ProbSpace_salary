@@ -133,6 +133,16 @@ class position_education(Feature):
         self.test[self.__class__.__name__] = whole['position_education_str'].map(le).values[len_train:]
 
 
+# areaとpartnerを結合&ラベルエンコーディング
+class area_partner(Feature):
+    def create_features(self):
+        whole = pd.concat([train, test], axis=0)
+        whole['area_partner_str'] = whole['area'] + '_' + whole['partner'].astype(str)
+        le = {k: i for i, k in enumerate(whole['area_partner_str'].unique())}
+        self.train[self.__class__.__name__] = whole['area_partner_str'].map(le).values[:len_train]
+        self.test[self.__class__.__name__] = whole['area_partner_str'].map(le).values[len_train:]
+
+
 # age / positionの平均年齢
 class age_div_mean_each_position(Feature):
     def create_features(self):
@@ -426,6 +436,20 @@ class age_diff_service_length(Feature):
     def create_features(self):
         self.train[self.__class__.__name__] = train['age'] - train['service_length']
         self.test[self.__class__.__name__] = test['age'] - test['service_length']
+
+
+# 結婚の有無・東京大阪勤務かどうかでグループ分け
+class partner_capital_group(Feature):
+    def create_features(self):
+        whole = pd.concat([train, test], axis=0)
+        whole['is_tokyo'] = whole['area'].apply(lambda x: 1 if x == '東京都' else 0)
+        whole['is_osaka'] = whole['area'].apply(lambda x: 1 if x == '大阪府' else 0)
+        whole['is_capital'] = whole['is_tokyo'] + whole['is_osaka']
+        whole['partner_capital_group_str'] = whole['partner'].astype(str) + '_' + whole['is_capital'].astype(str)
+        le = {'0_0': 0, '0_1': 1, '1_0': 2, '1_1': 3}
+        whole[self.__class__.__name__] = whole['partner_capital_group_str'].map(le)
+        self.train[self.__class__.__name__] = whole[self.__class__.__name__].values[:len_train]
+        self.test[self.__class__.__name__] = whole[self.__class__.__name__].values[len_train:]
 
 
 

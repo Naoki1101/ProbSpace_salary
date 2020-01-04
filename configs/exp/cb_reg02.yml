@@ -17,47 +17,51 @@ settings:
     - commute
     - overtime
     - position_area
-    - age_div_mean_each_position
-    - partner_div_mean_each_position
-    - num_child_div_mean_each_position
-    - education_div_mean_each_position
-    - service_length_div_mean_each_position
-    - study_time_div_mean_each_position
-    - commute_div_mean_each_position
-    - overtime_div_mean_each_position
-    - age_div_mean_each_area
-    - partner_div_mean_each_area
-    - num_child_div_mean_each_area
-    - education_div_mean_each_area
-    - service_length_div_mean_each_area
-    - study_time_div_mean_each_area
-    - commute_div_mean_each_area
-    - overtime_div_mean_each_area
-    - age_div_mean_each_sex
-    - partner_div_mean_each_sex
-    - num_child_div_mean_each_sex
-    - education_div_mean_each_sex
-    - service_length_div_mean_each_sex
-    - study_time_div_mean_each_sex
-    - commute_div_mean_each_sex
-    - overtime_div_mean_each_sex
-    - age_div_mean_each_education
-    - partner_div_mean_each_education
-    - num_child_div_mean_each_education
-    - education_div_mean_each_education
-    - service_length_div_mean_each_education
-    - study_time_div_mean_each_education
-    - commute_div_mean_each_education
-    - overtime_div_mean_each_education
-    - position_target_encoding_folds2
-    - area_target_encoding_folds2
-    - sex_target_encoding_folds2
-    - education_target_encoding_folds2
+    - position_education
+    # - age_div_mean_each_position
+    # - partner_div_mean_each_position
+    # - num_child_div_mean_each_position
+    # - education_div_mean_each_position
+    # - service_length_div_mean_each_position
+    # - study_time_div_mean_each_position
+    # - commute_div_mean_each_position
+    # - overtime_div_mean_each_position
+    # - age_div_mean_each_area
+    # - partner_div_mean_each_area
+    # - num_child_div_mean_each_area
+    # - education_div_mean_each_area
+    # - service_length_div_mean_each_area
+    # - study_time_div_mean_each_area
+    # - commute_div_mean_each_area
+    # - overtime_div_mean_each_area
+    # - age_div_mean_each_sex
+    # - partner_div_mean_each_sex
+    # - num_child_div_mean_each_sex
+    # - education_div_mean_each_sex
+    # - service_length_div_mean_each_sex
+    # - study_time_div_mean_each_sex
+    # - commute_div_mean_each_sex
+    # - overtime_div_mean_each_sex
+    # - age_div_mean_each_education
+    # - partner_div_mean_each_education
+    # - num_child_div_mean_each_education
+    # - education_div_mean_each_education
+    # - service_length_div_mean_each_education
+    # - study_time_div_mean_each_education
+    # - commute_div_mean_each_education
+    # - overtime_div_mean_each_education
+    # - position_target_encoding_folds2
+    # - area_target_encoding_folds2
+    # - sex_target_encoding_folds2
+    # - education_target_encoding_folds2
     - position_education_target_encoding_folds2
+    - partner_capital_group
   categorical_features:
     - area
-    - sex
+    # - sex
     - position_area
+    - position_education
+    - partner_capital_group
   
   fold_name: 02_stkfold
   drop_fname: 

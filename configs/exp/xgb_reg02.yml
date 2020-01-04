@@ -44,7 +44,7 @@ model_params:
   eval_metric: mae
   tree_method: hist
   eta: 0.01
-  max_depth: 7
+  max_depth: 9
   max_bin: 255
   subsample: 0.8
   colsample_bytree: 0.8
