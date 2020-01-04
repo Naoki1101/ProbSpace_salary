@@ -398,6 +398,7 @@ class NNRegressor(Model):
         model = CustomLinear(tr_x.shape[1]).to(device)
         criterion = nn.MSELoss()
         optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+        scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, len(train_loader), eta_min=1e-4)
 
         best_loss = 1e+10
         counter = 0
@@ -417,8 +418,9 @@ class NNRegressor(Model):
                     loss = criterion(y_pred.float(), y_batch.float())
                     optimizer.zero_grad()
                     loss.backward()
-                    optimizer.step()
-                    avg_loss += loss.item()
+                    # optimizer.step()
+                    scheduler.step()
+                    avg_loss += loss.item() / len(train_loader)
                     
                     model.eval()
                     valid_preds_fold = np.zeros((va_x.size(0)))
@@ -426,7 +428,7 @@ class NNRegressor(Model):
                     
                     for i, (x_batch, y_batch) in enumerate(valid_loader):
                         y_pred = model(x_batch.float()).detach()
-                        avg_val_loss += criterion(y_pred.float(), y_batch.float()).item()
+                        avg_val_loss += criterion(y_pred.float(), y_batch.float()).item() / len(valid_loader)
                         valid_preds_fold[i * batch_size: (i+1) * batch_size] = y_pred.float().numpy()[:, 0]
 
                 self.all_train_loss.append(avg_loss)
@@ -439,7 +441,8 @@ class NNRegressor(Model):
                 else:
                     counter += 1
 
-                print(f"[{epoch + 1:02}]  training's rmse: {np.sqrt(avg_loss / len(train_loader)):.4f}     valid_1's rmse: {np.sqrt(avg_val_loss / len(valid_loader)):.4f}")
+                print(f"[{epoch + 1:02}]  training's mse: {avg_loss:.4f}     valid_1's mse: {avg_val_loss:.4f}")
+                logging.debug(f"[{epoch + 1:02}]  training's mse: {avg_loss:.4f}     valid_1's mse: {avg_val_loss:.4f}")
 
     def predict(self, te_x, cat_features=None):
 
@@ -450,6 +453,7 @@ class NNRegressor(Model):
         test = torch.utils.data.TensorDataset(x_test_tensor)
         test_loader = torch.utils.data.DataLoader(test, batch_size=batch_size, shuffle=False)
 
+        self.model.eval()
         for i, (x_batch,) in enumerate(test_loader):
             y_pred = self.model(x_batch.float()).detach()
             test_preds_fold[i * batch_size: (i+1) * batch_size] = y_pred.numpy()[:, 0]

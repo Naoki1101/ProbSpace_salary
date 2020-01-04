@@ -1,6 +1,6 @@
 compe:
   compe_name: 
-  target_name: accuracy_group  # 提出するときのカラム名
-  id_name: game_session
-  metrics: qwk
+  target_name: y  # 提出するときのカラム名
+  id_name: id
+  metrics: mae
   seed: 42
