@@ -23,34 +23,6 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
                       cat_features=None, feval=None, metrics=None, convert_type='raw'):
 
     unique_fold = np.sort(folds['fold_id'].unique())
-    if 'ridge' in model_name:
-        model = RIDGRegression(params)
-    elif 'knn_clf' in model_name:
-        model = KNNClassifier(params)
-    elif 'knn_reg' in model_name:
-        model = KNNRegressor(params)
-    elif 'svm_clf' in model_name:
-        model = SVMClassifier(params)
-    elif 'svm_reg' in model_name:
-        model = SVMRegressor(params)
-    elif 'xgb_clf' in model_name:
-        model = XGBClassifier(params)
-    elif 'xgb_reg' in model_name:
-        model = XGBRegressor(params)
-    elif 'lgbm_reg' in model_name:
-        model = LGBRegressor(params)
-    elif 'lgbm_clf' in model_name:
-        model = LGBClassifier(params)
-    elif 'cb_reg' in model_name:
-        model = CBRegressor(params)
-    elif 'cb_clf' in model_name:
-        model = CBClassifier(params)
-    elif 'nn_reg' in model_name:
-        model = NNRegressor(params)
-    # elif 'nn_clf' in model_name:
-    #     model = NNClassifier(params)
-    else:
-        raise(NotImplementedError)
 
     if convert_type == 'log':
         train_y = np.log1p(train_y)
@@ -67,6 +39,35 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
 
         tr_x, va_x = train_x[folds['fold_id'] != fold_], train_x[folds['fold_id'] == fold_]
         tr_y, va_y = train_y[folds['fold_id'] != fold_], train_y[folds['fold_id'] == fold_]
+
+        if 'ridge' in model_name:
+            model = RIDGRegression(params)
+        elif 'knn_clf' in model_name:
+            model = KNNClassifier(params)
+        elif 'knn_reg' in model_name:
+            model = KNNRegressor(params)
+        elif 'svm_clf' in model_name:
+            model = SVMClassifier(params)
+        elif 'svm_reg' in model_name:
+            model = SVMRegressor(params)
+        elif 'xgb_clf' in model_name:
+            model = XGBClassifier(params)
+        elif 'xgb_reg' in model_name:
+            model = XGBRegressor(params)
+        elif 'lgbm_reg' in model_name:
+            model = LGBRegressor(params)
+        elif 'lgbm_clf' in model_name:
+            model = LGBClassifier(params)
+        elif 'cb_reg' in model_name:
+            model = CBRegressor(params)
+        elif 'cb_clf' in model_name:
+            model = CBClassifier(params)
+        elif 'nn_reg' in model_name:
+            model = NNRegressor(params)
+        # elif 'nn_clf' in model_name:
+        #     model = NNClassifier(params)
+        else:
+            raise(NotImplementedError)
 
         model.fit(tr_x, tr_y, va_x, va_y, cat_features=cat_features, feval=feval)
 
