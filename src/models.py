@@ -42,7 +42,7 @@ class RIDGRegression(Model):
 
     def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None, feval=None):
 
-        ridge = Ridge(normalize=True)
+        ridge = Ridge(**self.params)
         self.model = ridge.fit(tr_x, tr_y)
 
     def predict(self, te_x, cat_features=None):
