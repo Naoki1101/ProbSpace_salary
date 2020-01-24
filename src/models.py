@@ -6,6 +6,7 @@ from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
 from sklearn.svm import SVC, SVR
 import xgboost as xgb
 import lightgbm as lgb
+import optuna.integration.lightgbm_tuner as lgb_tuner
 from catboost import Pool, CatBoostRegressor, CatBoostClassifier
 from lightgbm.callback import _format_eval_result
 
@@ -267,6 +268,42 @@ class LGBRegressor(Model):
                 logger.log(level, '[{}]\t{}'.format(env.iteration + 1, result))
         _callback.order = 10
         return _callback
+
+
+class LGBTuner(Model):
+
+    def fit(self, tr_x, tr_y, va_x=None, va_y=None, cat_features=None, feval=None):
+
+        validation = va_x is not None
+        lgb_train = lgb.Dataset(tr_x, tr_y, categorical_feature=cat_features)
+        if validation:
+            lgb_eval = lgb.Dataset(va_x, va_y, reference=lgb_train, categorical_feature=cat_features)
+
+        logger = logging.getLogger('main')
+
+        best_params, tuning_history = dict(), list()
+        if validation:
+            self.model = lgb_tuner.train(self.params,
+                                         lgb_train,
+                                         num_boost_round=10000,
+                                         valid_sets=[lgb_eval],
+                                         verbose_eval=0,
+                                         early_stopping_rounds=200,
+                                         feval=feval,
+                                         best_params=best_params,
+                                         tuning_history=tuning_history)
+        else:
+            self.model = lgb_tuner.train(self.params,
+                                         lgb_train,
+                                         num_boost_round=10000,
+                                         best_params=best_params,
+                                         tuning_history=tuning_history)
+
+        logging.debug('Best Params:', best_params)
+        logging.debug('Tuning history:', tuning_history)
+
+    def predict(self, te_x, cat_features=None):
+        pass
 
 
 # ===============

@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import pandas as pd
 import logging
@@ -8,7 +9,7 @@ from models import RIDGRegression
 from models import KNNClassifier, KNNRegressor
 from models import SVMClassifier, SVMRegressor
 from models import XGBClassifier, XGBRegressor
-from models import LGBRegressor, LGBClassifier
+from models import LGBRegressor, LGBClassifier, LGBTuner
 from models import CBRegressor, CBClassifier
 from models import NNRegressor#, NNClassifier
 from metrics import Scorer
@@ -58,6 +59,9 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
             model = LGBRegressor(params)
         elif 'lgbm_clf' in model_name:
             model = LGBClassifier(params)
+        elif 'lgbm_tuner' in model_name:
+            model = LGBTuner(params)
+            break_flg = True
         elif 'cb_reg' in model_name:
             model = CBRegressor(params)
         elif 'cb_clf' in model_name:
@@ -70,6 +74,9 @@ def train_and_predict(train_x, train_y, test_x, params, folds, model_name=None,
             raise(NotImplementedError)
 
         model.fit(tr_x, tr_y, va_x, va_y, cat_features=cat_features, feval=feval)
+
+        if break_flg:
+            sys.exit()
 
         va_pred = model.predict(va_x, cat_features)
         oof[va_x.index] = va_pred
